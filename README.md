@@ -3,6 +3,7 @@ Ruby script to monitor for opsman config changes
 
 Tanzu Config Monitor will parse opsman configuration files and monitor specific variables for changes
 
+```
 Usage:
        tanzucfgmonitor [options]
 
@@ -13,6 +14,7 @@ where [options] are:
   -q, --query              Query variable values
   -v, --version            Print version and exit
   -h, --help               Show this message
+```
 
 # To Install
 gem install yaml optimist sqlite3
