@@ -24,6 +24,11 @@ The repo includes a sample config file saved from opsman that includes a few var
 
 You must specify a config file and you can use multiple configs in multiple runs.
 
+The script has 2 modes of operation: process and query.  You must specify one of the two otherwise the script will exit.  Query will dump the current value for all variables in the database.
+
+Example processing run:
+`./tanzucfgmonitor -f PKS_config.yaml -m tanzu-monitor.yaml -p`
+
 The script works by reading the list of variables to monitor.  This defaults to tanzu-monitor.yaml and has the default suggested variables to start with for BOSH and TKGI.
 
 The script then reads in the config file specified and gets the values of the variables from the monitorlist.  
