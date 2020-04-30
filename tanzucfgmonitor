@@ -1,0 +1,132 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+require 'optimist'
+require 'sqlite3'
+
+opts = Optimist::options do
+version "Tanzu Config Monitor 0.0.0"
+  banner <<-EOS
+Tanzu Config Monitor will parse opsman configuration files and monitor specific variables for changes
+
+Usage:
+       tanzucfgmonitor [options]
+
+where [options] are:
+EOS
+
+  opt :configfile, "Config file to monitor", short: "-f", type: :string
+  opt :monitorlist, "File with list of variables to monitor", short: "-m", type: :string, default: "tanzu-monitor.yaml"
+  opt :process, "Process config file", short: "-p"
+  opt :query, "Query variable values", short: "-q"
+end
+Optimist::die :configfile, "must be entered" if !opts[:configfile] 
+Optimist::die :configfile, "must be exist" if !opts[:configfile].nil? && !File.exist?(opts[:configfile])
+Optimist::die :process, "Must either process or query" if !opts[:process] && !opts[:query]
+Optimist::die :process, "Must select either process or query, not both" if opts[:process] && opts[:query]
+
+def get_variable(*args)
+   data = args[0]
+   
+   args.shift
+
+   # get section
+   if args[0].kind_of?(Array)
+     variables = args[0]
+     section = variables[0]
+     variables.shift
+   else
+     section = args[0]
+     args.shift
+     variables = args
+   end
+   
+   # check if Config file has Section
+   if not data.has_key?(section)
+       puts "Config file does not have section information for #{section}"
+       exit 1
+    end
+
+   parsepath = "data[\"#{section}\"]"
+   args.each do |arg|
+       if arg.kind_of?(Array)
+	 arg.each do |multiarg|
+           parsepath = parsepath+"[\"#{multiarg}\"]"
+	 end
+       else
+         parsepath = parsepath+"[\"#{arg}\"]"
+       end
+   end
+   # Handle errors
+   begin
+     return eval(parsepath)
+   rescue
+      puts "Config file does not have information for #{parsepath}"
+      exit 1
+   end
+end #EOF
+
+def process_variables(db,config,service,data)
+  exitvalue = 0
+  config['tanzu-config-monitor'][service].each do |config_variable|
+    value = get_variable(data,(service+','+config_variable).split(","))
+    query_result = db.get_first_value "SELECT value FROM variable_values WHERE section='#{service}' AND variable='#{config_variable}' ORDER by date DESC LIMIT 1"
+    if query_result.nil?
+      exitvalue = 1
+      puts "#{service},#{config_variable} (#{value}) being inserted into database"
+      db.execute "INSERT INTO variable_values ( section, variable, value,date) VALUES(?, ?, ?,julianday())",[service,config_variable, value.to_s]
+    elsif query_result != value.to_s
+      exitvalue = 1
+      puts service + "," + config_variable + " has changed (#{value.to_s})"
+      db.execute "INSERT INTO variable_values ( section, variable, value, date) VALUES(?, ?, ?,julianday())",[service,config_variable, value.to_s]
+    end
+  end
+  return exitvalue
+end
+
+def query_values(db,config,service,data)
+  config['tanzu-config-monitor'][service].each do |config_variable|
+    query = db.prepare "SELECT datetime(date, 'localtime'),value FROM variable_values WHERE section='#{service}' AND variable='#{config_variable}' ORDER by date"
+    query_result = query.execute!
+    puts sprintf("%s:\n\t%s\n",service,config_variable)
+    query_result.each do |row|
+      puts sprintf("\t\t%s | %s\n",row[0],row[1])
+    end
+    query.close if query
+    puts
+  end
+end
+
+config = File.open(opts[:monitorlist]) { |f| YAML::load(f) }
+data = File.open(opts[:configfile]) { |f| YAML::load(f) }
+exitvalue = 0
+
+if !File.exist?("tanzucfgmonitor.db")
+  db = SQLite3::Database.new("tanzucfgmonitor.db")
+  # Create a table
+  rows = db.execute <<-SQL
+    create table variable_values (
+      section varchar(50),
+      variable varchar(100),
+      value varchar(100),
+      date real
+    );
+  SQL
+else
+  db = SQLite3::Database.open("tanzucfgmonitor.db")
+end
+
+db.results_as_hash = true
+
+if opts[:process]
+  exitvalue1 = process_variables(db,config,'pivotal-container-service-config',data)
+  exitvalue2 = process_variables(db,config,'bosh-director-config',data)
+  exitvalue = exitvalue1 || exitvalue2
+elsif opts[:query]
+  query_values(db,config,'pivotal-container-service-config',data)
+  query_values(db,config,'bosh-director-config',data)
+end
+
+db.close if db
+
+exit exitvalue
