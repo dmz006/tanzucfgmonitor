@@ -7,13 +7,22 @@ Tanzu Config Monitor will parse opsman configuration files and monitor specific 
 Usage:
        tanzucfgmonitor [options]
 
+Example:
+       tanzuconfigmonitor -f TAS_config.yaml -p "cf-config,bosh-director-config"
+
+Process Config Options:
+       pivotal-container-service-config
+       bosh-director-config
+       cf-config
+
 where [options] are:
-  -f, --configfile=<s>     Config file to monitor
-  -m, --monitorlist=<s>    File with list of variables to monitor (default: tanzu-monitor.yaml)
-  -p, --process            Process config file
-  -q, --query              Query variable values
-  -v, --version            Print version and exit
-  -h, --help               Show this message
+  -f, --configfile=<s>      Config file to monitor
+  -m, --monitorlist=<s>     File with list of variables to monitor (default: tanzu-monitor.yaml)
+  -d, --databasefile=<s>    What file to save the results in (default: tanzucfgmonitor.db)
+  -p, --process=<s>         Process configs (default: pivotal-container-service-config,bosh-director-config)
+  -q, --query               Query database values
+  -v, --version             Print version and exit
+  -h, --help                Show this message
 ```
 
 # To Install
