@@ -5,29 +5,37 @@ require 'optimist'
 require 'sqlite3'
 
 opts = Optimist::options do
-version "Tanzu Config Monitor 0.0.0"
+version "Tanzu Config Monitor 0.0.1"
   banner <<-EOS
 Tanzu Config Monitor will parse opsman configuration files and monitor specific variables for changes
 
 Usage:
        tanzucfgmonitor [options]
 
+Example:
+       tanzuconfigmonitor -f TAS_config.yaml -p "cf-config,bosh-director-config"
+
+Process Config Options:
+       pivotal-container-service-config
+       bosh-director-config
+       cf-config
+
 where [options] are:
 EOS
 
   opt :configfile, "Config file to monitor", short: "-f", type: :string
   opt :monitorlist, "File with list of variables to monitor", short: "-m", type: :string, default: "tanzu-monitor.yaml"
-  opt :process, "Process config file", short: "-p"
-  opt :query, "Query variable values", short: "-q"
+  opt :databasefile, "What file to save the results in", short: "-d", type: :string, default: "tanzucfgmonitor.db"
+  opt :process, "Process configs", short: "-p", type: :string, default: "pivotal-container-service-config,bosh-director-config"
+  opt :query, "Query database values", short: "-q"
 end
-Optimist::die :configfile, "must be entered" if !opts[:configfile] 
+Optimist::die :configfile, "must be entered" if !opts[:configfile]
 Optimist::die :configfile, "must be exist" if !opts[:configfile].nil? && !File.exist?(opts[:configfile])
-Optimist::die :process, "Must either process or query" if !opts[:process] && !opts[:query]
-Optimist::die :process, "Must select either process or query, not both" if opts[:process] && opts[:query]
+Optimist::die :monitorlist, "must be exist" if !opts[:monitorlist].nil? && !File.exist?(opts[:monitorlist])
 
 def get_variable(*args)
    data = args[0]
-   
+
    args.shift
 
    # get section
@@ -40,7 +48,7 @@ def get_variable(*args)
      args.shift
      variables = args
    end
-   
+
    # check if Config file has Section
    if not data.has_key?(section)
        puts "Config file does not have section information for #{section}"
@@ -101,8 +109,8 @@ config = File.open(opts[:monitorlist]) { |f| YAML::load(f) }
 data = File.open(opts[:configfile]) { |f| YAML::load(f) }
 exitvalue = 0
 
-if !File.exist?("tanzucfgmonitor.db")
-  db = SQLite3::Database.new("tanzucfgmonitor.db")
+if !File.exist?(opts[:databasefile])
+  db = SQLite3::Database.new(opts[:databasefile])
   # Create a table
   rows = db.execute <<-SQL
     create table variable_values (
@@ -113,18 +121,22 @@ if !File.exist?("tanzucfgmonitor.db")
     );
   SQL
 else
-  db = SQLite3::Database.open("tanzucfgmonitor.db")
+  db = SQLite3::Database.open(opts[:databasefile])
 end
 
 db.results_as_hash = true
 
-if opts[:process]
-  exitvalue1 = process_variables(db,config,'pivotal-container-service-config',data)
-  exitvalue2 = process_variables(db,config,'bosh-director-config',data)
-  exitvalue = exitvalue1 || exitvalue2
-elsif opts[:query]
-  query_values(db,config,'pivotal-container-service-config',data)
-  query_values(db,config,'bosh-director-config',data)
+if opts[:query]
+  opts[:process].split(/,/).each do |service|
+    query_values(db,config,service,data)
+  end
+elsif opts[:process]
+  exitvalue = 0
+  process_exit_value = 0
+  opts[:process].split(/,/).each do |service|
+    process_exit_value = process_variables(db,config,service,data)
+  end
+  exitvalue = process_exit_value if process_exit_value == 1
 end
 
 db.close if db

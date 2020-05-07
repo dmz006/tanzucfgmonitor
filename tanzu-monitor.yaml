@@ -61,3 +61,51 @@ tanzu-config-monitor:
     - properties-configuration,syslog_configuration,port
     - properties-configuration,syslog_configuration,tls_enabled
     - properties-configuration,syslog_configuration,transport_protocol
+  cf-config:
+    - product-properties,.cloud_controller.allow_app_ssh_access,value
+    - product-properties,.cloud_controller.default_app_ssh_access,value
+    - product-properties,.cloud_controller.security_event_logging_enabled,value
+    - product-properties,.ha_proxy.skip_cert_verify,value
+    - product-properties,.mysql.remote_admin_access,value
+    - product-properties,.mysql_monitor.recipient_email,value
+    - product-properties,.nfs_server.blobstore_internal_access_rules,value
+    - product-properties,.properties.cc_logging_level,value
+    - product-properties,.properties.gorouter_ssl_ciphers,value
+    - product-properties,.properties.haproxy_ssl_ciphers,value
+    - product-properties,.properties.mysql_activity_logging,value
+    - product-properties,.properties.route_integrity,value
+    - product-properties,.properties.route_services.enable.ignore_ssl_cert_verification,value
+    - product-properties,.properties.router_client_cert_validation,value
+    - product-properties,.properties.routing_disable_http,value
+    - product-properties,.properties.routing_minimum_tls_version,value
+    - product-properties,.properties.routing_tls_termination,value
+    - product-properties,.properties.saml_signature_algorithm,value
+    - product-properties,.properties.syslog_host,value
+    - product-properties,.properties.syslog_tls,value
+    - product-properties,.properties.system_blobstore,value
+    - product-properties,.properties.system_database,value
+    - product-properties,.properties.tcp_routing,value
+    - product-properties,.properties.uaa,value
+    - product-properties,.properties.uaa.saml.require_signed_assertions,value
+    - product-properties,.properties.uaa.saml.sign_auth_requests,value
+    - product-properties,.properties.uaa.saml.sso_url,value
+    - product-properties,.properties.uaa_database,value
+    - product-properties,.properties.uaa_session_cookie_max_age,value
+    - product-properties,.properties.uaa_session_idle_timeout,value
+    - product-properties,.router.disable_insecure_cookies,value
+    - product-properties,.router.enable_isolated_routing,value
+    - product-properties,.router.enable_write_access_logs,value
+    - product-properties,.uaa.apps_manager_access_token_lifetime,value
+    - product-properties,.uaa.apps_manager_refresh_token_lifetime,value
+    - product-properties,.uaa.cf_cli_access_token_lifetime,value
+    - product-properties,.uaa.cf_cli_refresh_token_lifetime,value
+    - product-properties,.properties.container_networking_interface_plugin.silk.network_cidr,value
+    - product-properties,.properties.enable_tls_to_internal_pxc,value
+    - product-properties,.properties.experimental_dynamic_egress_enforcement,value
+    - product-properties,.properties.routing_log_client_ips,value
+    - product-properties,.properties.smtp_auth_mechanism,value
+    - product-properties,.properties.smtp_enable_starttls_auto,value
+    - product-properties,.properties.syslog_drop_debug,value
+    - product-properties,.properties.uaa.saml.name_id_format,value
+    - resource-config,ha_proxy,instances
+    - network-properties,network,name
