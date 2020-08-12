@@ -1,15 +1,9 @@
 tanzu-config-monitor:
   pivotal-container-service-config:
     - product-properties,.properties.cloud_provider,value
-    - product-properties,.properties.cloud_provider.azure.default_security_group,value
-    - product-properties,.properties.cloud_provider.azure.subscription_id,value
-    - product-properties,.properties.cloud_provider.azure.tenant_id,value
-    - product-properties,.properties.cloud_provider.azure.location,value
     - product-properties,.properties.log_sink_resources_deploy,value
     - product-properties,.properties.metric_sink_resources_deploy,value
     - product-properties,.properties.network_selector,value
-    - product-properties,.properties.network_selector.flannel.pod_network_cidr,value
-    - product-properties,.properties.network_selector.flannel.service_cluster_cidr,value
     - product-properties,.properties.oidc_selector,value
     - product-properties,.properties.pks_api_hostname,value
     - product-properties,.properties.plan1_selector,value
@@ -108,4 +102,74 @@ tanzu-config-monitor:
     - product-properties,.properties.syslog_drop_debug,value
     - product-properties,.properties.uaa.saml.name_id_format,value
     - resource-config,ha_proxy,instances
+    - network-properties,network,name
+  p-compliance-scanner-config:
+    - product-properties,.properties.ntp_server,value
+    - product-properties,.properties.syslog_host,value
+    - product-properties,.properties.syslog_port,value
+    - product-properties,.properties.benchmarks,value
+    - product-properties,.properties.bucket_selector,value
+  pivotal-mysql-config:
+    - product-properties,.properties.audit_logging_enabled,value
+    - product-properties,.properties.backups_selector,value
+    - product-properties,.properties.backups_selector.azure.account,value
+    - product-properties,.properties.backups_selector.azure.cron_schedule,value
+    - product-properties,.properties.enable_read_only_admin,value
+    - product-properties,.properties.enable_secure_binding_credentials,value
+    - product-properties,.properties.enable_tls_selector,value
+    - product-properties,.properties.global_recipient_email,value
+    - network-properties,network,name
+    - network-properties,service_network,name
+  pas-windows-config:
+    - product-properties,.properties.bosh_ssh_enabled,value
+    - product-properties,.properties.kms,value
+    - product-properties,.properties.rdp_enabled,value
+    - product-properties,.properties.system_logging,selected_option
+    - product-properties,.properties.system_logging,value
+    - product-properties,.properties.windows_admin_password, selected_option
+    - product-properties,.properties.windows_admin_password, value
+    - network-properties,network,name
+  p-spring-cloud-services-config:
+    - product-properties,.deploy-service-broker.disable_cert_check,value
+    - product-properties,.deploy-service-broker.secure_credentials,value
+    - product-properties,.register-service-broker.enable_global_access,value
+  p_spring-cloud-services-config:
+    - product-properties,.properties.apply_open_security_group,value
+    - product-properties,.properties.config_server_access,value
+    - network-properties,network,name
+  p-rabbitmq-config:
+    - product-properties,.properties.enable_tls_selector,value
+    - product-properties,.properties.global_settings_secure_bindings,value
+    - product-properties,.properties.global_settings_shareable_instances,value
+    - product-properties,.properties.multitenant_support,value
+    - product-properties,.properties.multitenant_support.enabled.broker_operator_set_policy_enabled,value
+    - product-properties,.properties.multitenant_support.enabled.server_ssl_fail_if_no_peer_cert,value
+    - product-properties,.properties.multitenant_support.enabled.server_ssl_verification_depth,value
+    - product-properties,.properties.multitenant_support.enabled.server_ssl_verify,value
+    - product-properties,.properties.multitenant_support.enabled.server_ssl_versions,value
+    - product-properties,.properties.syslog_selector,value
+    - network-properties,network,name
+    - network-properties,service_network,name
+  p-healthwatch-config:
+    - product-properties,.mysql.skip_name_resolve,value
+    - product-properties,.properties.opsman,value
+    - product-properties,.properties.opsman.enable.url,value
+    - product-properties,.properties.syslog_selector,value
+    - network-properties,network,name
+    - network-properties,service_network,name
+  p-cloudcache-config:
+    - product-properties,.properties.confirm_tls_setup,value
+    - product-properties,.properties.enable_secure_binding,value
+    - product-properties,.properties.syslog,value
+    - network-properties,network,name
+    - network-properties,service_network,name
+  azure-log-analytics-nozzle-config:
+    - product-properties,.properties.apply_open_security_group,value
+    - product-properties,.properties.cf_environment,value
+    - product-properties,.properties.firehose_user,value
+    - product-properties,.properties.log_level,value
+    - product-properties,properties.skip_ssl_validation,value
+    - network-properties,network,name
+  apmPostgres-config:
+    - product-properties,.errand-runner.push_apps_log_level,value
     - network-properties,network,name
